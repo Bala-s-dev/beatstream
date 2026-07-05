@@ -32,7 +32,9 @@ class AppShell extends StatelessWidget {
     // debugPrint('Current route: $location');
     // final hideAppBar = location == '/see-all-songs';
     final hideAppBar = location.contains('see-all-songs') ||
-        location.contains('see-all-albums');
+        location.contains('see-all-albums') ||
+        location.contains('album-detail');
+    ;
 
     return Scaffold(
       backgroundColor: AppColors.surface,

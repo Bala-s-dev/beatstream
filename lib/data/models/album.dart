@@ -1,14 +1,30 @@
 import 'package:equatable/equatable.dart';
+import 'song.dart';
 
 class Album extends Equatable {
-  const Album({required this.id, required this.imageUrl, this.title = ''});
+  const Album({
+    required this.id,
+    required this.title,
+    required this.imageUrl,
+    this.songs = const [],
+  });
 
   final String id;
-  final String imageUrl;
   final String title;
+  final String imageUrl;
+  final List<Song> songs;
+
+  Album copyWith({List<Song>? songs}) {
+    return Album(
+      id: id,
+      title: title,
+      imageUrl: imageUrl,
+      songs: songs ?? this.songs,
+    );
+  }
 
   @override
-  List<Object?> get props => [id, imageUrl, title];
+  List<Object?> get props => [id, title, imageUrl, songs];
 }
 
 class Artist extends Equatable {

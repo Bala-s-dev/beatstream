@@ -23,12 +23,14 @@ class NotificationsPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Notifications'),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.primary),
+            icon:
+                const Icon(Icons.arrow_back_rounded, color: AppColors.primary),
             onPressed: () => context.pop(),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.more_vert_rounded, color: AppColors.primary),
+              icon:
+                  const Icon(Icons.more_vert_rounded, color: AppColors.primary),
               onPressed: () {},
             ),
           ],
@@ -39,13 +41,12 @@ class NotificationsPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             final cubit = context.read<NotificationsCubit>();
-            return ListView.separated(
+            return ListView.builder(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.marginMobile,
                 vertical: AppSpacing.md,
               ),
               itemCount: state.settings.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final setting = state.settings[index];
                 return Padding(

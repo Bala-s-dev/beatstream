@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:beatstream/core/theme/app_colors.dart';
 import 'package:beatstream/core/theme/app_spacing.dart';
 import 'package:beatstream/core/theme/app_text_styles.dart';
@@ -134,16 +133,6 @@ class NowPlayingPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           IconButton(
-                            iconSize: 26,
-                            onPressed: cubit.toggleShuffle,
-                            icon: Icon(
-                              Icons.shuffle_rounded,
-                              color: state.isShuffle
-                                  ? AppColors.primary
-                                  : AppColors.secondary,
-                            ),
-                          ),
-                          IconButton(
                             iconSize: 32,
                             onPressed: cubit.skipPrevious,
                             icon: const Icon(
@@ -176,16 +165,6 @@ class NowPlayingPage extends StatelessWidget {
                             icon: const Icon(
                               Icons.skip_next_rounded,
                               color: AppColors.onSurface,
-                            ),
-                          ),
-                          IconButton(
-                            iconSize: 26,
-                            onPressed: cubit.toggleRepeat,
-                            icon: Icon(
-                              Icons.repeat_rounded,
-                              color: state.isRepeat
-                                  ? AppColors.primary
-                                  : AppColors.secondary,
                             ),
                           ),
                         ],

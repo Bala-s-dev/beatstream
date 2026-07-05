@@ -1,6 +1,7 @@
 //favorites
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -83,9 +84,12 @@ class _FavoritesView extends StatelessWidget {
                       return FavoriteSongTile(
                         key: ValueKey(song.id),
                         song: song,
-                        onTap: () => context
+                        onTap: () {
+                          context
                             .read<PlayerCubit>()
-                            .play(song, queue: state.songs),
+                            .play(song, queue: state.songs);
+                          context.push('/now-playing');
+                        },
                         onUnfavorite: () =>
                             context.read<FavoritesCubit>().unfavorite(song.id),
                       );

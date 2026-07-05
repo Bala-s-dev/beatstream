@@ -1,6 +1,6 @@
+import 'package:beatstream/features/home/view/album_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../features/auth/view/login_page.dart';
 import '../../features/auth/view/register_page.dart';
 import '../../features/favorites/view/favorites_page.dart';
@@ -17,6 +17,7 @@ import '../../features/home/view/see_all_songs_page.dart';
 import '../../data/models/song.dart';
 import '../../features/home/view/see_all_albums_page.dart';
 import '../../data/models/album.dart';
+
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -56,53 +57,6 @@ abstract final class AppRouter {
         path: '/search',
         builder: (context, state) => const SearchPage(),
       ),
-      GoRoute(
-        path: '/see-all-songs',
-        builder: (context, state) {
-          final extra = state.extra;
-          debugPrint('see-all-songs extra type: ${extra.runtimeType}');
-
-          if (extra is! Map) {
-            return Scaffold(
-              body: Center(child: Text('No data received (extra: $extra)')),
-            );
-          }
-
-          final rawSongs = extra['songs'];
-          debugPrint('songs runtimeType: ${rawSongs.runtimeType}');
-
-          final songs = (rawSongs as List).cast<Song>();
-
-          return SeeAllSongsPage(
-            title: extra['title'] as String,
-            songs: songs,
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/see-all-albums',
-        builder: (context, state) {
-          final extra = state.extra;
-          debugPrint('see-all-albums extra type: ${extra.runtimeType}');
-
-          if (extra is! Map) {
-            return Scaffold(
-              body: Center(child: Text('No data received (extra: $extra)')),
-            );
-          }
-
-          final rawAlbums = extra['albums'];
-          debugPrint('albums runtimeType: ${rawAlbums.runtimeType}');
-
-          final albums = (rawAlbums as List).cast<Album>();
-
-          return SeeAllAlbumsPage(
-            title: extra['title'] as String,
-            albums: albums,
-          );
-        },
-      ),
       // Bottom-nav shell: Home / Favorites / Profile.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -113,6 +67,87 @@ abstract final class AppRouter {
               GoRoute(
                 path: '/home',
                 builder: (context, state) => const HomePage(),
+                routes: [
+                  // Nested under /home so AppShell (and the mini-player)
+                  // stays mounted while viewing these pages.
+                  GoRoute(
+                    path: 'see-all-songs',
+                    builder: (context, state) {
+                      final extra = state.extra;
+                      debugPrint(
+                          'see-all-songs extra type: ${extra.runtimeType}');
+
+                      if (extra is! Map) {
+                        return Scaffold(
+                          body: Center(
+                            child: Text('No data received (extra: $extra)'),
+                          ),
+                        );
+                      }
+
+                      final rawSongs = extra['songs'];
+                      debugPrint('songs runtimeType: ${rawSongs.runtimeType}');
+
+                      final songs = (rawSongs as List).cast<Song>();
+
+                      return SeeAllSongsPage(
+                        title: extra['title'] as String,
+                        songs: songs,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'see-all-albums',
+                    builder: (context, state) {
+                      final extra = state.extra;
+                      debugPrint(
+                          'see-all-albums extra type: ${extra.runtimeType}');
+
+                      if (extra is! Map) {
+                        return Scaffold(
+                          body: Center(
+                            child: Text('No data received (extra: $extra)'),
+                          ),
+                        );
+                      }
+
+                      final rawAlbums = extra['albums'];
+                      debugPrint(
+                          'albums runtimeType: ${rawAlbums.runtimeType}');
+
+                      final albums = (rawAlbums as List).cast<Album>();
+
+                      return SeeAllAlbumsPage(
+                        title: extra['title'] as String,
+                        albums: albums,
+                      );
+                    },
+                  ),
+                   GoRoute(
+                    path: 'album-detail',
+                    builder: (context, state) {
+                      final extra = state.extra;
+                      if (extra is! Album) {
+                        return const Scaffold(
+                          body: Center(child: Text('No album data received')),
+                        );
+                      }
+                      return AlbumDetailPage(album: extra);
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'album-detail',
+                builder: (context, state) {
+                  final album = state.extra;
+                  if (album is! Album) {
+                    return const Scaffold(
+                      body: Center(child: Text('No album data received')),
+                    );
+                  }
+                  return AlbumDetailPage(album: album);
+                },
               ),
             ],
           ),

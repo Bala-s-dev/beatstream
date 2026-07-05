@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -90,7 +91,13 @@ class SeeAllAlbumsPage extends StatelessWidget {
                     final Album album = albums[index];
                     return _AlbumGridCard(
                       album: album,
-                      onTap: () => onAlbumTap?.call(album),
+                      onTap: () {
+                        if (onAlbumTap != null) {
+                          onAlbumTap!(album);
+                        } else {
+                          context.push('/home/album-detail', extra: album);
+                        }
+                      },
                     );
                   },
                   childCount: albums.length,

@@ -1,8 +1,6 @@
-//HomePage
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -115,9 +113,9 @@ class _HomeView extends StatelessWidget {
                   title: 'Trending Songs',
                   actionLabel: 'See all',
                   onAction: () {
-                    debugPrint(
-                        'See all tapped, songs: ${state.trendingSongs.length}');
-                    context.push('/see-all-songs', extra: {
+                    // debugPrint(
+                    //     'See all tapped, songs: ${state.trendingSongs.length}');
+                    context.push('/home/see-all-songs', extra: {
                       'title': 'Trending Songs',
                       'songs': state.trendingSongs,
                     });
@@ -139,9 +137,12 @@ class _HomeView extends StatelessWidget {
                     final Song song = state.trendingSongs[index];
                     return _TrendingCard(
                       song: song,
-                      onTap: () => context
+                      onTap: () {
+                        context
                           .read<PlayerCubit>()
-                          .play(song, queue: state.trendingSongs),
+                          .play(song, queue: state.trendingSongs);
+                        context.push('/now-playing');
+                      }
                     );
                   },
                 ),
@@ -155,7 +156,7 @@ class _HomeView extends StatelessWidget {
                   title: 'Popular Albums',
                   actionLabel: 'See all',
                   onAction: () => context.push(
-                    '/see-all-albums',
+                    '/home/see-all-albums',
                     extra: {
                       'title': 'Popular Albums',
                       'albums': state.popularAlbums,
@@ -178,9 +179,8 @@ class _HomeView extends StatelessWidget {
                     final Album album = state.popularAlbums[index];
                     return _AlbumCard(
                       album: album,
-                      onTap: () {
-                        // TODO: navigate to album detail / play album
-                      },
+                      onTap: () =>
+                          context.push('/home/album-detail', extra: album),
                     );
                   },
                 ),
