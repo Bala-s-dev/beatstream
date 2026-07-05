@@ -1,4 +1,4 @@
-import 'package:beatstream/features/home/view/album_detail_page.dart';
+import 'package:beatstream/features/home/album-screen/album_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/view/login_page.dart';
@@ -13,11 +13,10 @@ import '../../features/search/view/search_page.dart';
 import '../../features/settings/view/settings_page.dart';
 import '../../features/shell/app_shell.dart';
 import '../../features/welcome/view/welcome_page.dart';
-import '../../features/home/view/see_all_songs_page.dart';
+import '../../features/home/trending-song-screen/see_all_songs_page.dart';
 import '../../data/models/song.dart';
-import '../../features/home/view/see_all_albums_page.dart';
+import '../../features/home/album-screen/see_all_albums_page.dart';
 import '../../data/models/album.dart';
-
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -57,6 +56,22 @@ abstract final class AppRouter {
         path: '/search',
         builder: (context, state) => const SearchPage(),
       ),
+      // Single, top-level album-detail route. Reachable from Home, See All
+      // Albums, AND Search (which lives outside the shell) — so it must be
+      // top-level rather than nested under /home, matching /now-playing.
+      GoRoute(
+        path: '/album-detail',
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is! Album) {
+            return const Scaffold(
+              body: Center(child: Text('No album data received')),
+            );
+          }
+          return AlbumDetailPage(album: extra);
+        },
+      ),
+
       // Bottom-nav shell: Home / Favorites / Profile.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -69,14 +84,12 @@ abstract final class AppRouter {
                 builder: (context, state) => const HomePage(),
                 routes: [
                   // Nested under /home so AppShell (and the mini-player)
-                  // stays mounted while viewing these pages.
+                  // stays mounted while viewing these pages. These are only
+                  // ever reached FROM Home, so nesting is safe here.
                   GoRoute(
                     path: 'see-all-songs',
                     builder: (context, state) {
                       final extra = state.extra;
-                      debugPrint(
-                          'see-all-songs extra type: ${extra.runtimeType}');
-
                       if (extra is! Map) {
                         return Scaffold(
                           body: Center(
@@ -84,12 +97,7 @@ abstract final class AppRouter {
                           ),
                         );
                       }
-
-                      final rawSongs = extra['songs'];
-                      debugPrint('songs runtimeType: ${rawSongs.runtimeType}');
-
-                      final songs = (rawSongs as List).cast<Song>();
-
+                      final songs = (extra['songs'] as List).cast<Song>();
                       return SeeAllSongsPage(
                         title: extra['title'] as String,
                         songs: songs,
@@ -100,9 +108,6 @@ abstract final class AppRouter {
                     path: 'see-all-albums',
                     builder: (context, state) {
                       final extra = state.extra;
-                      debugPrint(
-                          'see-all-albums extra type: ${extra.runtimeType}');
-
                       if (extra is! Map) {
                         return Scaffold(
                           body: Center(
@@ -110,44 +115,14 @@ abstract final class AppRouter {
                           ),
                         );
                       }
-
-                      final rawAlbums = extra['albums'];
-                      debugPrint(
-                          'albums runtimeType: ${rawAlbums.runtimeType}');
-
-                      final albums = (rawAlbums as List).cast<Album>();
-
+                      final albums = (extra['albums'] as List).cast<Album>();
                       return SeeAllAlbumsPage(
                         title: extra['title'] as String,
                         albums: albums,
                       );
                     },
                   ),
-                   GoRoute(
-                    path: 'album-detail',
-                    builder: (context, state) {
-                      final extra = state.extra;
-                      if (extra is! Album) {
-                        return const Scaffold(
-                          body: Center(child: Text('No album data received')),
-                        );
-                      }
-                      return AlbumDetailPage(album: extra);
-                    },
-                  ),
                 ],
-              ),
-              GoRoute(
-                path: 'album-detail',
-                builder: (context, state) {
-                  final album = state.extra;
-                  if (album is! Album) {
-                    return const Scaffold(
-                      body: Center(child: Text('No album data received')),
-                    );
-                  }
-                  return AlbumDetailPage(album: album);
-                },
               ),
             ],
           ),

@@ -6,8 +6,8 @@ import 'search_state.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   SearchCubit({required MusicRepository musicRepository})
-    : _musicRepository = musicRepository,
-      super(const SearchState());
+      : _musicRepository = musicRepository,
+        super(const SearchState());
 
   final MusicRepository _musicRepository;
   final Debouncer _debouncer = Debouncer(
@@ -24,7 +24,13 @@ class SearchCubit extends Cubit<SearchState> {
 
     if (value.trim().isEmpty) {
       _debouncer.dispose();
-      emit(state.copyWith(status: SearchStatus.idle, results: const []));
+      emit(
+        state.copyWith(
+          status: SearchStatus.idle,
+          results: const [],
+          albumResults: const [],
+        ),
+      );
       return;
     }
 
@@ -35,12 +41,16 @@ class SearchCubit extends Cubit<SearchState> {
   Future<void> _search(String query) async {
     final int requestId = ++_requestId;
     final results = await _musicRepository.search(query);
+    final albumResults = await _musicRepository.searchAlbums(query);
     if (requestId != _requestId || isClosed) return;
+
+    final bool isEmpty = results.isEmpty && albumResults.isEmpty;
 
     emit(
       state.copyWith(
-        status: results.isEmpty ? SearchStatus.empty : SearchStatus.success,
+        status: isEmpty ? SearchStatus.empty : SearchStatus.success,
         results: results,
+        albumResults: albumResults,
       ),
     );
   }

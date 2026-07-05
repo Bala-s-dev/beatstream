@@ -664,6 +664,15 @@ class MockMusicRepository implements MusicRepository {
   }
 
   @override
+  Future<List<Album>> searchAlbums(String query) async {
+    await Future.delayed(const Duration(milliseconds: 250));
+    final String q = query.trim().toLowerCase();
+    if (q.isEmpty) return const [];
+
+    return _albums.where((a) => a.title.toLowerCase().contains(q)).toList();
+  }
+
+  @override
   Future<Song> toggleFavorite(String songId) async {
     await Future.delayed(const Duration(milliseconds: 150));
 

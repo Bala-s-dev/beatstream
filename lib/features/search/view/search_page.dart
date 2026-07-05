@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_network_image.dart';
-import '../../../data/models/song.dart';
+import '../../../data/models/album.dart';
 import '../../../data/repositories/music_repository.dart';
 import 'package:beatstream/features/now_playing/cubit/player_cubit.dart';
 import '../cubit/search_cubit.dart';
@@ -75,7 +76,7 @@ class _SearchViewState extends State<_SearchView> {
                   onChanged: context.read<SearchCubit>().queryChanged,
                   style: AppTextStyles.bodyLg(),
                   decoration: const InputDecoration(
-                    hintText: 'Search songs, artists...',
+                    hintText: 'Search songs, artists, albums...',
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -97,7 +98,7 @@ class _SearchViewState extends State<_SearchView> {
             case SearchStatus.idle:
               return Center(
                 child: Text(
-                  'Search for songs or artists',
+                  'Search for songs, artists, or albums',
                   style: AppTextStyles.bodyLg(color: AppColors.secondary),
                 ),
               );
@@ -118,38 +119,147 @@ class _SearchViewState extends State<_SearchView> {
                 ),
               );
             case SearchStatus.success:
-              return ListView.builder(
+              return ListView(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.marginMobile,
                   vertical: AppSpacing.md,
                 ),
-                itemCount: state.results.length,
-                itemBuilder: (context, index) {
-                  final Song song = state.results[index];
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                children: [
+                  if (state.albumResults.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.marginMobile,
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: AppNetworkImage(url: song.imageUrl, width: 48),
+                      child: Text(
+                        'Albums',
+                        style: AppTextStyles.headlineMd(),
+                      ),
                     ),
-                    title: Text(song.title, style: AppTextStyles.bodyLg()),
-                    subtitle: Text(
-                      song.artist,
-                      style: AppTextStyles.bodyMd(color: AppColors.secondary),
+                    const SizedBox(height: AppSpacing.md),
+                    SizedBox(
+                      height: 170,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.marginMobile,
+                        ),
+                        itemCount: state.albumResults.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(width: AppSpacing.md),
+                        itemBuilder: (context, index) {
+                          final Album album = state.albumResults[index];
+                          return _AlbumResultCard(
+                            album: album,
+                            onTap: () => context.push(
+                              '/album-detail',
+                              extra: album,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                    onTap: () => context
-                        .read<PlayerCubit>()
-                        .play(song, queue: state.results),
-                  );
-                },
+                    const SizedBox(height: AppSpacing.xl),
+                  ],
+                  if (state.results.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.marginMobile,
+                      ),
+                      child: Text(
+                        'Songs',
+                        style: AppTextStyles.headlineMd(),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.marginMobile,
+                      ),
+                      child: Column(
+                        children: [
+                          for (final song in state.results)
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: AppNetworkImage(
+                                  url: song.imageUrl,
+                                  width: 48,
+                                ),
+                              ),
+                              title: Text(
+                                song.title,
+                                style: AppTextStyles.bodyLg(),
+                              ),
+                              subtitle: Text(
+                                song.artist,
+                                style: AppTextStyles.bodyMd(
+                                  color: AppColors.secondary,
+                                ),
+                              ),
+                              onTap: () {
+                                context.read<PlayerCubit>().play(
+                                      song,
+                                      queue: state.results,
+                                    );
+                                context.push('/now-playing');
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               );
           }
         },
+      ),
+    );
+  }
+}
+
+class _AlbumResultCard extends StatelessWidget {
+  const _AlbumResultCard({required this.album, required this.onTap});
+
+  final Album album;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 120,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.outlineVariant),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: AppNetworkImage(
+                  url: album.imageUrl,
+                  icon: Icons.album_rounded,
+                  width: 120,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              album.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyMd(),
+            ),
+          ],
+        ),
       ),
     );
   }

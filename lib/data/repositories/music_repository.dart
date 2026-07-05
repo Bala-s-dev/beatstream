@@ -21,7 +21,7 @@ abstract class MusicRepository {
 
   Future<Song> toggleFavorite(String songId);
 
-  /// Simple client-side search across titles/artists. In a real
-  /// implementation this would likely hit a `/search` endpoint instead.
   Future<List<Song>> search(String query);
+
+  Future<List<Album>> searchAlbums(String query);
 }

@@ -119,7 +119,7 @@ class _RegisterViewState extends State<_RegisterView> {
                         label: 'Phone Number',
                         uppercaseLabel: false,
                         controller: _phoneController,
-                        hint: '+1 (555) 000-0000',
+                        hint: '+91 98765 43210',
                         prefixIcon: Icons.call_outlined,
                         keyboardType: TextInputType.phone,
                         autofillHints: const [AutofillHints.telephoneNumber],

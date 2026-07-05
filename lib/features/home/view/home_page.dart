@@ -180,7 +180,7 @@ class _HomeView extends StatelessWidget {
                     return _AlbumCard(
                       album: album,
                       onTap: () =>
-                          context.push('/home/album-detail', extra: album),
+                          context.push('/album-detail', extra: album),
                     );
                   },
                 ),

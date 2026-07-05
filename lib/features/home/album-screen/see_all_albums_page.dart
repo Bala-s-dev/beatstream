@@ -95,7 +95,7 @@ class SeeAllAlbumsPage extends StatelessWidget {
                         if (onAlbumTap != null) {
                           onAlbumTap!(album);
                         } else {
-                          context.push('/home/album-detail', extra: album);
+                          context.push('/album-detail', extra: album);
                         }
                       },
                     );
