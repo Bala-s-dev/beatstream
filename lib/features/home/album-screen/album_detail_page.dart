@@ -1,3 +1,4 @@
+import 'package:beatstream/features/shell/mini_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -149,6 +150,10 @@ class AlbumDetailPage extends StatelessWidget {
             ),
           const SliverToBoxAdapter(child: SizedBox(height: 140)),
         ],
+      ),
+      bottomNavigationBar: const SafeArea(
+        top: false,
+        child: MiniPlayer(),
       ),
     );
   }

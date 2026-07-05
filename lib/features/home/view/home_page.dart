@@ -13,7 +13,6 @@ import '../../now_playing/cubit/player_cubit.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
-
 /// The Home tab body. Rendered inside the shared shell scaffold (which
 /// supplies the persistent AppBar, mini-player, and bottom nav), so this
 /// widget is *just* the scrollable content.
@@ -113,8 +112,6 @@ class _HomeView extends StatelessWidget {
                   title: 'Trending Songs',
                   actionLabel: 'See all',
                   onAction: () {
-                    // debugPrint(
-                    //     'See all tapped, songs: ${state.trendingSongs.length}');
                     context.push('/home/see-all-songs', extra: {
                       'title': 'Trending Songs',
                       'songs': state.trendingSongs,
@@ -139,10 +136,10 @@ class _HomeView extends StatelessWidget {
                       song: song,
                       onTap: () {
                         context
-                          .read<PlayerCubit>()
-                          .play(song, queue: state.trendingSongs);
+                            .read<PlayerCubit>()
+                            .play(song, queue: state.trendingSongs);
                         context.push('/now-playing');
-                      }
+                      },
                     );
                   },
                 ),
@@ -161,7 +158,7 @@ class _HomeView extends StatelessWidget {
                       'title': 'Popular Albums',
                       'albums': state.popularAlbums,
                     },
-                  )
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -179,8 +176,7 @@ class _HomeView extends StatelessWidget {
                     final Album album = state.popularAlbums[index];
                     return _AlbumCard(
                       album: album,
-                      onTap: () =>
-                          context.push('/album-detail', extra: album),
+                      onTap: () => context.push('/album-detail', extra: album),
                     );
                   },
                 ),
@@ -205,27 +201,7 @@ class _HomeView extends StatelessWidget {
                       const SizedBox(width: AppSpacing.lg),
                   itemBuilder: (context, index) {
                     final Artist artist = state.artists[index];
-                    return Column(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.outlineVariant,
-                            ),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: AppNetworkImage(
-                            url: artist.imageUrl,
-                            icon: Icons.person_rounded,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(artist.name, style: AppTextStyles.labelSm()),
-                      ],
-                    );
+                    return _ArtistAvatar(artist: artist);
                   },
                 ),
               ),
@@ -392,6 +368,76 @@ class _AlbumCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Tapping an artist fetches every song credited to them (across trending,
+/// album tracks, favorites, recently played) and pushes the same
+/// SeeAllSongsPage used elsewhere in the app, with the artist's name as
+/// the page title.
+class _ArtistAvatar extends StatefulWidget {
+  const _ArtistAvatar({required this.artist});
+
+  final Artist artist;
+
+  @override
+  State<_ArtistAvatar> createState() => _ArtistAvatarState();
+}
+
+class _ArtistAvatarState extends State<_ArtistAvatar> {
+  bool _isLoading = false;
+
+  Future<void> _handleTap() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    final musicRepository = context.read<MusicRepository>();
+    final songs = await musicRepository.getSongsByArtist(widget.artist.name);
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    context.push(
+      '/home/see-all-songs',
+      extra: {'title': widget.artist.name, 'songs': songs},
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _handleTap,
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.outlineVariant),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: AppNetworkImage(
+                  url: widget.artist.imageUrl,
+                  icon: Icons.person_rounded,
+                ),
+              ),
+              if (_isLoading)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(widget.artist.name, style: AppTextStyles.labelSm()),
+        ],
       ),
     );
   }
