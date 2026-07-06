@@ -67,7 +67,7 @@ class MiniPlayer extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Now Playing: ${song.title}',
+                            'Playing: ${song.title}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTextStyles.bodyMd(),
@@ -88,7 +88,16 @@ class MiniPlayer extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
+                    IconButton(
+                      onPressed:
+                          state.queue.length > 1 ? cubit.skipPrevious : null,
+                      icon: Icon(
+                        Icons.skip_previous_rounded,
+                        color: state.queue.length > 1
+                            ? AppColors.primary
+                            : AppColors.outlineVariant,
+                      ),
+                    ),
                     IconButton(
                       onPressed: cubit.togglePlayPause,
                       icon: Icon(
@@ -96,6 +105,15 @@ class MiniPlayer extends StatelessWidget {
                             ? Icons.pause_rounded
                             : Icons.play_arrow_rounded,
                         color: AppColors.primary,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: state.queue.length > 1 ? cubit.skipNext : null,
+                      icon: Icon(
+                        Icons.skip_next_rounded,
+                        color: state.queue.length > 1
+                            ? AppColors.primary
+                            : AppColors.outlineVariant,
                       ),
                     ),
                   ],
