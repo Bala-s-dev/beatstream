@@ -78,7 +78,10 @@ class _LoginViewState extends State<_LoginView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(height: AppSpacing.xl),
-                      // App identity
+                      // App identity - uses the real app icon (see
+                      // assets/icons/app_icon.png, same image used for
+                      // flutter_launcher_icons / flutter_native_splash) so
+                      // the login screen matches the launcher & splash.
                       Container(
                         width: 64,
                         height: 64,
@@ -87,10 +90,13 @@ class _LoginViewState extends State<_LoginView> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.graphic_eq_rounded,
-                          color: AppColors.surface,
-                          size: 32,
+                        clipBehavior: Clip.antiAlias,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Image.asset(
+                            'assets/icons/app_icon.png',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
@@ -163,7 +169,7 @@ class _LoginViewState extends State<_LoginView> {
                       const SizedBox(height: AppSpacing.lg),
                       Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Divider(color: AppColors.outlineVariant),
                           ),
                           Padding(
@@ -258,9 +264,7 @@ class _PasswordFieldState extends State<_PasswordField> {
       trailing: IconButton(
         splashRadius: 20,
         icon: Icon(
-          _obscure
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
+          _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
           color: AppColors.outline,
           size: 20,
         ),

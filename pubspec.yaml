@@ -35,6 +35,7 @@ dev_dependencies:
   mocktail: ^1.0.4
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
 
 flutter_launcher_icons:
   android: true
@@ -43,8 +44,14 @@ flutter_launcher_icons:
   adaptive_icon_background: "#000000"
   adaptive_icon_foreground: "assets/icons/app_icon.png"
 
+flutter_native_splash:
+  color: "#F9F9F9"
+  color_dark: "#121212"
+  image: assets/icons/app_icon.png
+
 flutter:
   uses-material-design: true
 
   assets:
     - assets/animations/
+    - assets/icons/
