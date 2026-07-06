@@ -1,4 +1,3 @@
-//favorites_state
 import 'package:equatable/equatable.dart';
 import '../../../data/models/song.dart';
 

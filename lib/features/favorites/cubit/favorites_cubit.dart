@@ -1,4 +1,3 @@
-//favorites_cubit
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/repositories/music_repository.dart';
 import 'favorites_state.dart';
